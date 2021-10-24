@@ -1,10 +1,12 @@
 import React , {Component} from 'react'
 import classes from './Quiz.module.css'
 import ActiveQuiz from "../../components/ActiveQuiz/ActiveQuiz";
+import FinishedQuiz from "../../components/FinishedQuiz/FinishedQuiz";
 
 class Quiz extends Component{
     state = {
         activeQuestion:0,
+        isFinished:true,
         answerState: null,
         quiz:[
             {
@@ -35,6 +37,7 @@ class Quiz extends Component{
     }
 
     onAnswerClickHandler = (answerId) =>{
+        //Избежание повторного нажатия на правильный ответ для перехода на вопрос вперед
         if(this.state.answerState){
             const key = Object.keys(this.state.answerState)[0];
             if(this.state.answerState[key] === 'success'){
@@ -51,12 +54,18 @@ class Quiz extends Component{
             const timeout = window.setTimeout(()=>{
                 //Если опрос закончен
                 if(this.isQuizFinished()){
-                    console.log('Finished!');
+
+                    this.setState({
+                        isFinished: true
+                    })
+
                 }else{
+
                     this.setState({
                         activeQuestion:this.state.activeQuestion + 1,
                         answerState:null
                     })
+
                 }
             },2000)
 
@@ -79,14 +88,18 @@ class Quiz extends Component{
 
                 <div className={classes.QuizWrapper}>
                     <h1>Ответьте на все вопросы</h1>
-                    <ActiveQuiz
-                        question = {this.state.quiz[this.state.activeQuestion].question}
-                        answers = {this.state.quiz[this.state.activeQuestion].answers}
-                        onAnswerClick = {this.onAnswerClickHandler}
-                        quizLength = {this.state.quiz.length}
-                        answerNumber = {this.state.activeQuestion + 1}
-                        state = {this.state.answerState}
-                    />
+                    {
+                        this.state.isFinished ? <FinishedQuiz />
+                           : <ActiveQuiz
+                                question = {this.state.quiz[this.state.activeQuestion].question}
+                                answers = {this.state.quiz[this.state.activeQuestion].answers}
+                                onAnswerClick = {this.onAnswerClickHandler}
+                                quizLength = {this.state.quiz.length}
+                                answerNumber = {this.state.activeQuestion + 1}
+                                state = {this.state.answerState}
+                            />
+                    }
+
                 </div>
             </div>
         );
